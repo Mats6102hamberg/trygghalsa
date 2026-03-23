@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getOrCreateDbUser } from '@/lib/auth/getOrCreateUser';
-import { eventSchema } from '@/lib/validation/event';
+import { updateEventSchema } from '@/lib/validation/event';
 
 export async function GET(
   _request: Request,
@@ -35,7 +35,7 @@ export async function PUT(
   }
 
   const body = await request.json();
-  const parsed = eventSchema.safeParse(body);
+  const parsed = updateEventSchema.safeParse(body);
 
   if (!parsed.success) {
     return NextResponse.json(
@@ -52,19 +52,20 @@ export async function PUT(
     return NextResponse.json({ error: 'Event not found' }, { status: 404 });
   }
 
+  const updateData: Record<string, unknown> = {};
+  if (parsed.data.date !== undefined) updateData.date = parsed.data.date;
+  if (parsed.data.type !== undefined) updateData.type = parsed.data.type;
+  if (parsed.data.title !== undefined) updateData.title = parsed.data.title;
+  if (parsed.data.description !== undefined) updateData.description = parsed.data.description ?? null;
+  if (parsed.data.providerName !== undefined) updateData.providerName = parsed.data.providerName ?? null;
+  if (parsed.data.location !== undefined) updateData.location = parsed.data.location ?? null;
+  if (parsed.data.tags !== undefined) updateData.tags = parsed.data.tags;
+  if (parsed.data.isPrivate !== undefined) updateData.isPrivate = parsed.data.isPrivate;
+  if (parsed.data.attachments !== undefined) updateData.attachments = parsed.data.attachments ?? [];
+
   const updated = await prisma.event.update({
     where: { id },
-    data: {
-      date: parsed.data.date,
-      type: parsed.data.type,
-      title: parsed.data.title,
-      description: parsed.data.description ?? null,
-      providerName: parsed.data.providerName ?? null,
-      location: parsed.data.location ?? null,
-      tags: parsed.data.tags ?? [],
-      isPrivate: parsed.data.isPrivate ?? true,
-      attachments: parsed.data.attachments ?? [],
-    },
+    data: updateData,
   });
 
   return NextResponse.json(updated);
