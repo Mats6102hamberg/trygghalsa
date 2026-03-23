@@ -1,25 +1,28 @@
-export interface TimelineEvent {
-  id: string;
-  date: string;
-  type: 'visit' | 'diagnosis' | 'medication' | 'test' | 'vaccine';
-  title: string;
-  description?: string | null;
-  providerName?: string | null;
-  location?: string | null;
-  tags: string[];
-  isPrivate: boolean;
-  attachments: Attachment[];
-  createdAt: string;
-  updatedAt: string;
-}
+export type EventType = 'visit' | 'diagnosis' | 'medication' | 'test' | 'vaccine';
 
-export interface Attachment {
+export type Attachment = {
   url: string;
   name: string;
   type: string;
-}
+};
 
-export interface AISummary {
+export type Event = {
+  id: string;
+  user_id: string;
+  date: string;
+  type: EventType;
+  title: string;
+  description: string | null;
+  provider_name: string | null;
+  location: string | null;
+  tags: string[];
+  is_private: boolean;
+  attachments: Attachment[];
+  created_at: string;
+  updated_at: string;
+};
+
+export type AISummary = {
   summary: string;
   questions: string[];
-}
+};

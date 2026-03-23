@@ -3,24 +3,14 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
-
-interface TimelineEvent {
-  id: string;
-  date: string;
-  type: string;
-  title: string;
-  description?: string | null;
-  providerName?: string | null;
-  location?: string | null;
-  tags: string[];
-}
+import type { Event } from '@/types';
 
 const typeLabels: Record<string, string> = {
   visit: 'Besök',
   diagnosis: 'Diagnos',
-  medication: 'Medicinering',
-  test: 'Provtagning',
-  vaccine: 'Vaccination',
+  medication: 'Läkemedel',
+  test: 'Prov/Test',
+  vaccine: 'Vaccin',
 };
 
 const typeColors: Record<string, string> = {
@@ -31,8 +21,8 @@ const typeColors: Record<string, string> = {
   vaccine: 'bg-purple-100 text-purple-800',
 };
 
-export function Timeline({ initialEvents }: { initialEvents?: TimelineEvent[] }) {
-  const [events, setEvents] = useState<TimelineEvent[]>(initialEvents ?? []);
+export function Timeline({ initialEvents }: { initialEvents?: Event[] }) {
+  const [events, setEvents] = useState<Event[]>(initialEvents ?? []);
   const [loading, setLoading] = useState(!initialEvents);
   const [error, setError] = useState<string | null>(null);
 
@@ -85,43 +75,29 @@ export function Timeline({ initialEvents }: { initialEvents?: TimelineEvent[] })
   return (
     <div className="space-y-4">
       {events.map((event) => (
-        <Link
-          key={event.id}
-          href={`/dashboard/events/${event.id}`}
-          className="block rounded-lg border border-gray-200 bg-white p-5 hover:border-blue-300 hover:shadow-sm transition-all"
-        >
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-3 mb-1">
-                <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${typeColors[event.type] || 'bg-gray-100 text-gray-800'}`}>
-                  {typeLabels[event.type] || event.type}
-                </span>
-                {event.providerName && (
-                  <span className="text-sm text-gray-500">{event.providerName}</span>
-                )}
-                {event.location && (
-                  <span className="text-sm text-gray-400">{event.location}</span>
-                )}
-              </div>
-              <h3 className="font-semibold text-gray-900">{event.title}</h3>
-              {event.description && (
-                <p className="mt-1 text-sm text-gray-600 line-clamp-2">{event.description}</p>
-              )}
-              {event.tags.length > 0 && (
-                <div className="mt-2 flex gap-1.5">
-                  {event.tags.map((tag) => (
-                    <span key={tag} className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-            <time className="shrink-0 text-sm text-gray-500">
-              {format(new Date(event.date), 'yyyy-MM-dd')}
-            </time>
+        <div key={event.id} className="border-l-4 border-blue-500 pl-4">
+          <div className="text-sm text-gray-500">
+            {format(new Date(event.date), 'yyyy-MM-dd')} {'\u2022'} {typeLabels[event.type] || event.type}
           </div>
-        </Link>
+          <Link href={`/dashboard/events/${event.id}`}>
+            <h3 className="font-bold text-gray-900 hover:text-blue-600">{event.title}</h3>
+          </Link>
+          {event.description && (
+            <p className="mt-1 text-sm text-gray-600 line-clamp-2">{event.description}</p>
+          )}
+          {event.provider_name && (
+            <span className="text-xs text-gray-400">{event.provider_name}</span>
+          )}
+          {event.tags.length > 0 && (
+            <div className="mt-1 flex gap-1.5">
+              {event.tags.map((tag) => (
+                <span key={tag} className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
       ))}
     </div>
   );

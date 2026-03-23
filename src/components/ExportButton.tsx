@@ -1,12 +1,12 @@
 'use client';
 
-import type { TimelineEvent } from '@/types';
+import type { Event } from '@/types';
 
-export function ExportButton({ events }: { events: TimelineEvent[] }) {
+export function ExportButton({ events }: { events: Event[] }) {
   function handleExport() {
     const lines = events.map(
       (e) =>
-        `${e.date} | ${e.type}: ${e.title}${e.providerName ? ` (${e.providerName})` : ''}${e.description ? ` – ${e.description}` : ''}`
+        `${e.date} | ${e.type}: ${e.title}${e.provider_name ? ` (${e.provider_name})` : ''}${e.description ? ` – ${e.description}` : ''}`
     );
 
     const content = `TryggHälsa – Exporterad tidslinje\n${'='.repeat(40)}\n\n${lines.join('\n')}`;

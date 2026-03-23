@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db';
 import { getOrCreateDbUser } from '@/lib/auth/getOrCreateUser';
 import { redirect, notFound } from 'next/navigation';
 import { EventForm } from '@/components/EventForm';
+import type { Event } from '@/types';
 
 export default async function EditEventPage({
   params,
@@ -19,10 +20,19 @@ export default async function EditEventPage({
   if (!event) notFound();
 
   const serialized = {
-    ...event,
-    attachments: event.attachments as { url: string; name: string; type: string }[],
-    createdAt: event.createdAt.toISOString(),
-    updatedAt: event.updatedAt.toISOString(),
+    id: event.id,
+    user_id: event.userId,
+    date: event.date,
+    type: event.type as Event['type'],
+    title: event.title,
+    description: event.description,
+    provider_name: event.providerName,
+    location: event.location,
+    tags: event.tags,
+    is_private: event.isPrivate,
+    attachments: event.attachments as Event['attachments'],
+    created_at: event.createdAt.toISOString(),
+    updated_at: event.updatedAt.toISOString(),
   };
 
   return (

@@ -2,28 +2,17 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-interface EventData {
-  id?: string;
-  date: string;
-  type: string;
-  title: string;
-  description?: string | null;
-  providerName?: string | null;
-  location?: string | null;
-  tags: string[];
-  isPrivate: boolean;
-}
+import type { Event } from '@/types';
 
 const eventTypes = [
   { value: 'visit', label: 'Besök' },
   { value: 'diagnosis', label: 'Diagnos' },
-  { value: 'medication', label: 'Medicinering' },
-  { value: 'test', label: 'Provtagning' },
-  { value: 'vaccine', label: 'Vaccination' },
+  { value: 'medication', label: 'Läkemedel' },
+  { value: 'test', label: 'Prov/Test' },
+  { value: 'vaccine', label: 'Vaccin' },
 ];
 
-export function EventForm({ event }: { event?: EventData }) {
+export function EventForm({ event }: { event?: Partial<Event> }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -43,10 +32,10 @@ export function EventForm({ event }: { event?: EventData }) {
       type: form.get('type') as string,
       title: form.get('title') as string,
       description: (form.get('description') as string) || null,
-      providerName: (form.get('providerName') as string) || null,
+      providerName: (form.get('provider_name') as string) || null,
       location: (form.get('location') as string) || null,
       tags: tagsRaw ? tagsRaw.split(',').map((t) => t.trim()).filter(Boolean) : [],
-      isPrivate: form.get('isPrivate') === 'on',
+      isPrivate: form.get('is_private') === 'on',
     };
 
     const url = isEditing ? `/api/events/${event.id}` : '/api/events';
@@ -142,12 +131,12 @@ export function EventForm({ event }: { event?: EventData }) {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="providerName" className="block text-sm font-medium text-gray-700 mb-1">Vårdgivare</label>
+          <label htmlFor="provider_name" className="block text-sm font-medium text-gray-700 mb-1">Vårdgivare</label>
           <input
             type="text"
-            id="providerName"
-            name="providerName"
-            defaultValue={event?.providerName || ''}
+            id="provider_name"
+            name="provider_name"
+            defaultValue={event?.provider_name || ''}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
           />
         </div>
@@ -178,12 +167,12 @@ export function EventForm({ event }: { event?: EventData }) {
       <div className="flex items-center gap-2">
         <input
           type="checkbox"
-          id="isPrivate"
-          name="isPrivate"
-          defaultChecked={event?.isPrivate ?? true}
+          id="is_private"
+          name="is_private"
+          defaultChecked={event?.is_private ?? true}
           className="rounded border-gray-300"
         />
-        <label htmlFor="isPrivate" className="text-sm text-gray-700">Privat händelse</label>
+        <label htmlFor="is_private" className="text-sm text-gray-700">Privat händelse</label>
       </div>
 
       <div className="flex gap-3">
