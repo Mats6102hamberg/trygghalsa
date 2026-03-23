@@ -11,7 +11,7 @@ export default async function MedicationsPage() {
 
   const rawMeds = await prisma.medication.findMany({
     where: { userId: dbUserResult.user.id },
-    orderBy: [{ isActive: 'desc' }, { startDate: 'desc' }],
+    orderBy: { name: 'asc' },
   });
 
   const medications: Medication[] = rawMeds.map((m) => ({
@@ -19,11 +19,8 @@ export default async function MedicationsPage() {
     user_id: m.userId,
     name: m.name,
     dosage: m.dosage,
-    frequency: m.frequency,
-    start_date: m.startDate,
-    end_date: m.endDate,
-    notes: m.notes,
-    reminder_time: m.reminderTime,
+    instructions: m.instructions,
+    times: m.times,
     is_active: m.isActive,
     created_at: m.createdAt.toISOString(),
     updated_at: m.updatedAt.toISOString(),

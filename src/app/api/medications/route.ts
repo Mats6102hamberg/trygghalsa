@@ -10,8 +10,8 @@ export async function GET() {
   }
 
   const medications = await prisma.medication.findMany({
-    where: { userId: dbUserResult.user.id },
-    orderBy: [{ isActive: 'desc' }, { startDate: 'desc' }],
+    where: { userId: dbUserResult.user.id, isActive: true },
+    orderBy: { name: 'asc' },
   });
 
   return NextResponse.json(medications);
@@ -38,11 +38,9 @@ export async function POST(request: Request) {
       userId: dbUserResult.user.id,
       name: parsed.data.name,
       dosage: parsed.data.dosage ?? null,
-      frequency: parsed.data.frequency ?? null,
-      startDate: parsed.data.startDate,
-      endDate: parsed.data.endDate ?? null,
-      notes: parsed.data.notes ?? null,
-      reminderTime: parsed.data.reminderTime ?? null,
+      instructions: parsed.data.instructions ?? null,
+      times: parsed.data.times ?? [],
+      isActive: parsed.data.is_active ?? true,
     },
   });
 

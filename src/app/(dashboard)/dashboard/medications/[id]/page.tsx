@@ -23,20 +23,19 @@ export default async function EditMedicationPage({
     user_id: med.userId,
     name: med.name,
     dosage: med.dosage,
-    frequency: med.frequency,
-    start_date: med.startDate,
-    end_date: med.endDate,
-    notes: med.notes,
-    reminder_time: med.reminderTime,
+    instructions: med.instructions,
+    times: med.times,
     is_active: med.isActive,
     created_at: med.createdAt.toISOString(),
     updated_at: med.updatedAt.toISOString(),
   };
 
   return (
-    <div className="max-w-2xl">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Redigera medicin</h1>
-      <MedicationForm medication={serialized} />
-    </div>
+    <main className="min-h-screen bg-gray-50 p-6">
+      <div className="mx-auto max-w-2xl rounded-2xl border bg-white p-6">
+        <h1 className="text-2xl font-bold mb-6">Redigera medicin</h1>
+        <MedicationForm medication={serialized} />
+      </div>
+    </main>
   );
 }

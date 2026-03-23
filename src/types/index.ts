@@ -74,14 +74,24 @@ export type Medication = {
   user_id: string;
   name: string;
   dosage: string | null;
-  frequency: string | null;
-  start_date: string;
-  end_date: string | null;
-  notes: string | null;
-  reminder_time: string | null;
+  instructions: string | null;
+  times: string[];
   is_active: boolean;
   created_at: string;
   updated_at: string;
+};
+
+export type MedicationLog = {
+  id: string;
+  medication_id: string;
+  user_id: string;
+  taken_at: string;
+  scheduled_time: string | null;
+  created_at: string;
+};
+
+export type MedicationWithStatus = Medication & {
+  takenTodayTimes: string[];
 };
 
 export type AppointmentStatus = 'scheduled' | 'cancelled' | 'completed';

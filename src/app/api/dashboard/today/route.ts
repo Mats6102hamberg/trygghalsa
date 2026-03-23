@@ -15,7 +15,7 @@ export async function GET() {
   const [medications, appointments, questions] = await Promise.all([
     prisma.medication.findMany({
       where: { userId, isActive: true },
-      select: { id: true, name: true, dosage: true, reminderTime: true },
+      select: { id: true, name: true, dosage: true, times: true },
       orderBy: { name: 'asc' },
     }),
     prisma.appointment.findMany({
@@ -41,7 +41,7 @@ export async function GET() {
       id: m.id,
       name: m.name,
       dosage: m.dosage,
-      reminder_time: m.reminderTime,
+      times: m.times,
     })),
     appointments: appointments.map((a) => ({
       id: a.id,

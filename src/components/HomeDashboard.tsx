@@ -7,7 +7,7 @@ import { sv } from 'date-fns/locale';
 import type { HomeScreenSettings, HomeScreenButton } from '@/types';
 
 interface TodayData {
-  medications: { id: string; name: string; dosage: string | null; reminder_time: string | null }[];
+  medications: { id: string; name: string; dosage: string | null; times: string[] }[];
   appointments: { id: string; title: string; date_time: string; provider_name: string | null }[];
   questions: { id: string; text: string }[];
 }
@@ -96,8 +96,8 @@ export default function HomeDashboard() {
     const items: string[] = [];
 
     for (const med of todayData.medications) {
-      const time = med.reminder_time ? ` kl ${med.reminder_time}` : '';
-      items.push(`Ta ${med.name}${med.dosage ? ` ${med.dosage}` : ''}${time}`);
+      const timeStr = med.times.length > 0 ? ` kl ${med.times.join(' och ')}` : '';
+      items.push(`Ta ${med.name}${med.dosage ? ` ${med.dosage}` : ''}${timeStr}`);
     }
 
     for (const apt of todayData.appointments) {
