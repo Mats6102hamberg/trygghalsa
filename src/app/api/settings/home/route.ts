@@ -1,14 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getOrCreateDbUser } from '@/lib/auth/getOrCreateUser';
-import { z } from 'zod';
-
-const settingsSchema = z.object({
-  simplicityLevel: z.enum(['very_simple', 'simple', 'expanded']).optional(),
-  todayMessage: z.string().max(500).nullable().optional(),
-  emergencyContactName: z.string().max(200).nullable().optional(),
-  emergencyContactPhone: z.string().max(50).nullable().optional(),
-});
+import { homeSettingsSchema, defaultButtons } from '@/lib/validation/home-settings';
 
 export async function GET() {
   const dbUserResult = await getOrCreateDbUser();
@@ -16,25 +9,38 @@ export async function GET() {
     return NextResponse.json({ error: dbUserResult.error }, { status: dbUserResult.status });
   }
 
-  const settings = await prisma.homeScreenSettings.findUnique({
-    where: { userId: dbUserResult.user.id },
-  });
+  const userId = dbUserResult.user.id;
 
-  if (!settings) {
-    return NextResponse.json({
-      simplicity_level: 'simple',
-      today_message: null,
-      emergency_contact_name: null,
-      emergency_contact_phone: null,
-    });
-  }
+  const [settings, buttons] = await Promise.all([
+    prisma.homeScreenSettings.findUnique({ where: { userId } }),
+    prisma.homeScreenButton.findMany({
+      where: { userId },
+      orderBy: { sortOrder: 'asc' },
+    }),
+  ]);
+
+  const responseButtons = buttons.length > 0
+    ? buttons.map((b) => ({
+        button_key: b.buttonKey,
+        label: b.label,
+        is_visible: b.isVisible,
+        sort_order: b.sortOrder,
+        is_primary: b.isPrimary,
+      }))
+    : defaultButtons.map((b) => ({
+        button_key: b.buttonKey,
+        label: b.label,
+        is_visible: b.isVisible,
+        sort_order: b.sortOrder,
+        is_primary: b.isPrimary,
+      }));
 
   return NextResponse.json({
-    id: settings.id,
-    simplicity_level: settings.simplicityLevel,
-    today_message: settings.todayMessage,
-    emergency_contact_name: settings.emergencyContactName,
-    emergency_contact_phone: settings.emergencyContactPhone,
+    simplicity_level: settings?.simplicityLevel ?? 'simple',
+    today_message: settings?.todayMessage ?? null,
+    emergency_contact_name: settings?.emergencyContactName ?? null,
+    emergency_contact_phone: settings?.emergencyContactPhone ?? null,
+    buttons: responseButtons,
   });
 }
 
@@ -45,7 +51,7 @@ export async function PUT(request: Request) {
   }
 
   const body = await request.json();
-  const parsed = settingsSchema.safeParse(body);
+  const parsed = homeSettingsSchema.safeParse(body);
 
   if (!parsed.success) {
     return NextResponse.json(
@@ -54,28 +60,57 @@ export async function PUT(request: Request) {
     );
   }
 
+  const userId = dbUserResult.user.id;
+
   const settings = await prisma.homeScreenSettings.upsert({
-    where: { userId: dbUserResult.user.id },
+    where: { userId },
     create: {
-      userId: dbUserResult.user.id,
-      simplicityLevel: parsed.data.simplicityLevel ?? 'simple',
-      todayMessage: parsed.data.todayMessage ?? null,
-      emergencyContactName: parsed.data.emergencyContactName ?? null,
-      emergencyContactPhone: parsed.data.emergencyContactPhone ?? null,
+      userId,
+      simplicityLevel: parsed.data.simplicity_level,
+      todayMessage: parsed.data.today_message ?? null,
+      emergencyContactName: parsed.data.emergency_contact_name ?? null,
+      emergencyContactPhone: parsed.data.emergency_contact_phone ?? null,
     },
     update: {
-      ...(parsed.data.simplicityLevel !== undefined && { simplicityLevel: parsed.data.simplicityLevel }),
-      ...(parsed.data.todayMessage !== undefined && { todayMessage: parsed.data.todayMessage }),
-      ...(parsed.data.emergencyContactName !== undefined && { emergencyContactName: parsed.data.emergencyContactName }),
-      ...(parsed.data.emergencyContactPhone !== undefined && { emergencyContactPhone: parsed.data.emergencyContactPhone }),
+      simplicityLevel: parsed.data.simplicity_level,
+      todayMessage: parsed.data.today_message ?? null,
+      emergencyContactName: parsed.data.emergency_contact_name ?? null,
+      emergencyContactPhone: parsed.data.emergency_contact_phone ?? null,
     },
   });
 
+  // Delete existing buttons and recreate
+  await prisma.homeScreenButton.deleteMany({ where: { userId } });
+
+  if (parsed.data.buttons.length > 0) {
+    await prisma.homeScreenButton.createMany({
+      data: parsed.data.buttons.map((b) => ({
+        userId,
+        buttonKey: b.button_key,
+        label: b.label,
+        isVisible: b.is_visible,
+        sortOrder: b.sort_order,
+        isPrimary: b.is_primary,
+      })),
+    });
+  }
+
+  const buttons = await prisma.homeScreenButton.findMany({
+    where: { userId },
+    orderBy: { sortOrder: 'asc' },
+  });
+
   return NextResponse.json({
-    id: settings.id,
     simplicity_level: settings.simplicityLevel,
     today_message: settings.todayMessage,
     emergency_contact_name: settings.emergencyContactName,
     emergency_contact_phone: settings.emergencyContactPhone,
+    buttons: buttons.map((b) => ({
+      button_key: b.buttonKey,
+      label: b.label,
+      is_visible: b.isVisible,
+      sort_order: b.sortOrder,
+      is_primary: b.isPrimary,
+    })),
   });
 }

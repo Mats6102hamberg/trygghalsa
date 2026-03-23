@@ -20,6 +20,7 @@ model User {
   appointments  Appointment[]
   questions          Question[]
   homeScreenSettings HomeScreenSettings?
+  homeScreenButtons  HomeScreenButton[]
   careRelationsAsUser      CareRelationship[] @relation("CareUser")
   careRelationsAsCaregiver CareRelationship[] @relation("Caregiver")
 
@@ -179,4 +180,22 @@ model HomeScreenSettings {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("home_screen_settings")
+}
+
+model HomeScreenButton {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id")
+  buttonKey String   @map("button_key")
+  label     String
+  isVisible Boolean  @default(true) @map("is_visible")
+  sortOrder Int      @default(0) @map("sort_order")
+  isPrimary Boolean  @default(false) @map("is_primary")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, buttonKey])
+  @@index([userId])
+  @@map("home_screen_buttons")
 }
