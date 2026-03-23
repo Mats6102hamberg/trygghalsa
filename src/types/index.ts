@@ -112,3 +112,32 @@ export type Question = {
   created_at: string;
   updated_at: string;
 };
+
+export type CareRelationshipStatus = 'pending' | 'active' | 'revoked';
+
+export type CareRelationship = {
+  id: string;
+  user_id: string;
+  caregiver_user_id: string;
+  relationship_type: string;
+  status: CareRelationshipStatus;
+  can_customize_home: boolean;
+  can_view_timeline: boolean;
+  can_view_medications: boolean;
+  can_view_appointments: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type SimplicityLevel = 'very_simple' | 'simple' | 'expanded';
+
+export type HomeScreenSettings = {
+  id: string;
+  user_id: string;
+  simplicity_level: SimplicityLevel;
+  today_message: string | null;
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
+  created_at: string;
+  updated_at: string;
+};

@@ -18,7 +18,10 @@ model User {
   importJobs    ImportJob[]
   medications   Medication[]
   appointments  Appointment[]
-  questions     Question[]
+  questions          Question[]
+  homeScreenSettings HomeScreenSettings?
+  careRelationsAsUser      CareRelationship[] @relation("CareUser")
+  careRelationsAsCaregiver CareRelationship[] @relation("Caregiver")
 
   @@map("users")
 }
@@ -139,4 +142,41 @@ model Question {
   @@index([userId])
   @@index([appointmentId])
   @@map("questions")
+}
+
+model CareRelationship {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String   @map("user_id")
+  caregiverUserId  String   @map("caregiver_user_id")
+  relationshipType String   @default("anhörig") @map("relationship_type")
+  status           String   @default("pending")
+  canCustomizeHome Boolean  @default(true) @map("can_customize_home")
+  canViewTimeline  Boolean  @default(true) @map("can_view_timeline")
+  canViewMedications  Boolean @default(true) @map("can_view_medications")
+  canViewAppointments Boolean @default(true) @map("can_view_appointments")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  user      User @relation("CareUser", fields: [userId], references: [id], onDelete: Cascade)
+  caregiver User @relation("Caregiver", fields: [caregiverUserId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, caregiverUserId])
+  @@index([userId])
+  @@index([caregiverUserId])
+  @@map("care_relationships")
+}
+
+model HomeScreenSettings {
+  id                    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                String   @unique @map("user_id")
+  simplicityLevel       String   @default("simple") @map("simplicity_level")
+  todayMessage          String?  @map("today_message")
+  emergencyContactName  String?  @map("emergency_contact_name")
+  emergencyContactPhone String?  @map("emergency_contact_phone")
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt             DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("home_screen_settings")
 }
