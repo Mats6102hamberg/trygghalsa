@@ -29,22 +29,30 @@ export function Timeline({ initialEvents }: { initialEvents?: Event[] }) {
   useEffect(() => {
     if (initialEvents) return;
 
+    const controller = new AbortController();
+
     const loadEvents = async () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch('/api/events');
+        const res = await fetch('/api/events', {
+          signal: controller.signal,
+        });
         if (!res.ok) throw new Error('Kunde inte hämta händelser.');
         const data = await res.json();
         setEvents(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Något gick fel.');
+        if ((err as Error).name !== 'AbortError') {
+          setError(err instanceof Error ? err.message : 'Något gick fel.');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     loadEvents();
+
+    return () => controller.abort();
   }, [initialEvents]);
 
   if (loading) {
@@ -77,7 +85,7 @@ export function Timeline({ initialEvents }: { initialEvents?: Event[] }) {
       {events.map((event) => (
         <div key={event.id} className="border-l-4 border-blue-500 pl-4">
           <div className="text-sm text-gray-500">
-            {format(new Date(event.date), 'yyyy-MM-dd')} {'\u2022'} {typeLabels[event.type] || event.type}
+            {format(new Date(event.date), 'yyyy-MM-dd')} {'\u2022'} {typeLabels[event.type] ?? event.type}
           </div>
           <Link href={`/dashboard/events/${event.id}`}>
             <h3 className="font-bold text-gray-900 hover:text-blue-600">{event.title}</h3>
