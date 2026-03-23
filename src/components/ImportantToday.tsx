@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { format } from 'date-fns';
+import { sv } from 'date-fns/locale';
 
 interface TodayData {
   medications: { id: string; name: string; dosage: string | null; reminder_time: string | null }[];
@@ -10,7 +10,14 @@ interface TodayData {
   questions: { id: string; text: string }[];
 }
 
-export function ImportantToday() {
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 10) return 'God morgon';
+  if (hour < 17) return 'Hej';
+  return 'God kväll';
+}
+
+export function ImportantToday({ userName }: { userName?: string }) {
   const [data, setData] = useState<TodayData | null>(null);
 
   useEffect(() => {
@@ -24,68 +31,43 @@ export function ImportantToday() {
     return () => controller.abort();
   }, []);
 
-  if (!data) return null;
+  const today = format(new Date(), 'EEEE d MMMM', { locale: sv });
+  const greeting = getGreeting();
+  const displayName = userName || 'du';
 
-  const hasContent = data.medications.length > 0 || data.appointments.length > 0 || data.questions.length > 0;
+  const items: string[] = [];
 
-  if (!hasContent) {
-    return (
-      <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-center">
-        <p className="text-sm text-green-700">Allt ser bra ut idag</p>
-      </div>
-    );
+  if (data) {
+    for (const med of data.medications) {
+      const time = med.reminder_time ? ` kl ${med.reminder_time}` : '';
+      items.push(`Ta ${med.name}${med.dosage ? ` ${med.dosage}` : ''}${time}`);
+    }
+
+    for (const apt of data.appointments) {
+      const day = format(new Date(apt.date_time), 'EEEE', { locale: sv });
+      const time = format(new Date(apt.date_time), 'HH:mm');
+      items.push(`${apt.title} på ${day} kl ${time}`);
+    }
+
+    for (const q of data.questions) {
+      items.push(`Kom ihåg fråga om ${q.text.toLowerCase()}`);
+    }
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-3">
-      {data.medications.length > 0 && (
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">Mediciner idag</h3>
-          <div className="space-y-2">
-            {data.medications.map((med) => (
-              <div key={med.id} className="text-sm">
-                <span className="font-medium text-gray-800">{med.name}</span>
-                {med.dosage && <span className="text-gray-500"> {med.dosage}</span>}
-                {med.reminder_time && <span className="text-gray-400 ml-1">kl {med.reminder_time}</span>}
-              </div>
-            ))}
-          </div>
-          <Link href="/dashboard/medications" className="mt-3 inline-block text-xs text-blue-600 hover:underline">
-            Alla mediciner
-          </Link>
-        </div>
-      )}
+    <div className="rounded-2xl bg-white p-5 shadow">
+      <h2 className="text-lg font-bold">{greeting} {displayName} &#10084;&#65039;</h2>
+      <p className="text-sm text-gray-600 mt-1">Idag är det {today}</p>
 
-      {data.appointments.length > 0 && (
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">Kommande bokningar</h3>
-          <div className="space-y-2">
-            {data.appointments.map((apt) => (
-              <div key={apt.id} className="text-sm">
-                <span className="font-medium text-gray-800">{apt.title}</span>
-                <p className="text-gray-500">{format(new Date(apt.date_time), 'dd/MM HH:mm')}</p>
-              </div>
-            ))}
-          </div>
-          <Link href="/dashboard/appointments" className="mt-3 inline-block text-xs text-blue-600 hover:underline">
-            Alla bokningar
-          </Link>
+      {items.length > 0 ? (
+        <div className="mt-4 space-y-2 text-sm">
+          {items.map((item, i) => (
+            <p key={i}>&bull; {item}</p>
+          ))}
         </div>
-      )}
-
-      {data.questions.length > 0 && (
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">Obesvarade frågor</h3>
-          <div className="space-y-1">
-            {data.questions.map((q) => (
-              <p key={q.id} className="text-sm text-gray-600 truncate">{q.text}</p>
-            ))}
-          </div>
-          <Link href="/dashboard/questions" className="mt-3 inline-block text-xs text-blue-600 hover:underline">
-            Alla frågor
-          </Link>
-        </div>
-      )}
+      ) : data ? (
+        <p className="mt-4 text-sm text-gray-500">Allt ser bra ut idag &#128155;</p>
+      ) : null}
     </div>
   );
 }

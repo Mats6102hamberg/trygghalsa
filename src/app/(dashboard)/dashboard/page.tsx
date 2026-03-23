@@ -1,15 +1,19 @@
 import { prisma } from '@/lib/db';
 import { getOrCreateDbUser } from '@/lib/auth/getOrCreateUser';
+import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import Timeline from '@/components/Timeline';
 import AISummary from '@/components/AISummary';
 import { ImportantToday } from '@/components/ImportantToday';
-import Link from 'next/link';
+import { QuickActions } from '@/components/QuickActions';
 import type { Event } from '@/types';
 
 export default async function DashboardPage() {
   const dbUserResult = await getOrCreateDbUser();
   if ('error' in dbUserResult) redirect('/sign-in');
+
+  const clerkUser = await currentUser();
+  const firstName = clerkUser?.firstName ?? undefined;
 
   const rawEvents = await prisma.event.findMany({
     where: { userId: dbUserResult.user.id },
@@ -34,24 +38,9 @@ export default async function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 p-6">
-      <div className="mx-auto max-w-4xl space-y-6">
-        <div className="flex flex-col justify-between gap-4 rounded-2xl border bg-white p-6 sm:flex-row sm:items-center">
-          <div>
-            <h1 className="text-2xl font-bold">TryggHälsa</h1>
-            <p className="mt-2 text-sm text-gray-600">
-              Samla din medicinska historik, skapa överblick och förbered dig inför vårdbesök.
-            </p>
-          </div>
-
-          <Link
-            href="/dashboard/events/new"
-            className="rounded-lg bg-blue-600 px-4 py-2 text-center text-white"
-          >
-            Lägg till händelse
-          </Link>
-        </div>
-
-        <ImportantToday />
+      <div className="mx-auto max-w-md space-y-6">
+        <ImportantToday userName={firstName} />
+        <QuickActions />
         <AISummary />
         <Timeline initialEvents={events} />
       </div>
