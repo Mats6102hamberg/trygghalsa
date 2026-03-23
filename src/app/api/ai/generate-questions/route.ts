@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 
   const formattedEvents = formatEventsTimeline(events);
   const medicationList = medications
-    .map((m) => `${m.name}${m.dosage ? ` ${m.dosage}` : ''}${m.frequency ? ` (${m.frequency})` : ''}`)
+    .map((m) => `${m.name}${m.dosage ? ` ${m.dosage}` : ''}${m.times.length > 0 ? ` (${m.times.join(', ')})` : ''}`)
     .join('\n');
 
   const prompt = `Du hjälper en patient att förbereda frågor inför ett läkarbesök.
