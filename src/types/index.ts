@@ -129,7 +129,26 @@ export type CareRelationship = {
   updated_at: string;
 };
 
+export type HomeButtonKey =
+  | 'medications'
+  | 'health'
+  | 'appointments'
+  | 'help'
+  | 'questions'
+  | 'timeline'
+  | 'contact_family';
+
 export type SimplicityLevel = 'very_simple' | 'simple' | 'expanded';
+
+export type HomeScreenButton = {
+  id: string;
+  user_id: string;
+  button_key: HomeButtonKey;
+  label: string;
+  is_visible: boolean;
+  sort_order: number;
+  is_primary: boolean;
+};
 
 export type HomeScreenSettings = {
   id: string;
@@ -138,6 +157,5 @@ export type HomeScreenSettings = {
   today_message: string | null;
   emergency_contact_name: string | null;
   emergency_contact_phone: string | null;
-  created_at: string;
-  updated_at: string;
+  buttons: HomeScreenButton[];
 };

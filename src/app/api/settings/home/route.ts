@@ -11,36 +11,47 @@ export async function GET() {
 
   const userId = dbUserResult.user.id;
 
-  const [settings, buttons] = await Promise.all([
-    prisma.homeScreenSettings.findUnique({ where: { userId } }),
-    prisma.homeScreenButton.findMany({
-      where: { userId },
-      orderBy: { sortOrder: 'asc' },
-    }),
-  ]);
+  let settings = await prisma.homeScreenSettings.findUnique({
+    where: { userId },
+  });
 
-  const responseButtons = buttons.length > 0
-    ? buttons.map((b) => ({
-        button_key: b.buttonKey,
-        label: b.label,
-        is_visible: b.isVisible,
-        sort_order: b.sortOrder,
-        is_primary: b.isPrimary,
-      }))
-    : defaultButtons.map((b) => ({
-        button_key: b.buttonKey,
-        label: b.label,
-        is_visible: b.isVisible,
-        sort_order: b.sortOrder,
-        is_primary: b.isPrimary,
-      }));
+  if (!settings) {
+    settings = await prisma.homeScreenSettings.create({
+      data: {
+        userId,
+        simplicityLevel: 'simple',
+      },
+    });
+
+    await prisma.homeScreenButton.createMany({
+      data: defaultButtons.map((b) => ({
+        userId,
+        ...b,
+      })),
+    });
+  }
+
+  const buttons = await prisma.homeScreenButton.findMany({
+    where: { userId },
+    orderBy: { sortOrder: 'asc' },
+  });
 
   return NextResponse.json({
-    simplicity_level: settings?.simplicityLevel ?? 'simple',
-    today_message: settings?.todayMessage ?? null,
-    emergency_contact_name: settings?.emergencyContactName ?? null,
-    emergency_contact_phone: settings?.emergencyContactPhone ?? null,
-    buttons: responseButtons,
+    id: settings.id,
+    user_id: settings.userId,
+    simplicity_level: settings.simplicityLevel,
+    today_message: settings.todayMessage,
+    emergency_contact_name: settings.emergencyContactName,
+    emergency_contact_phone: settings.emergencyContactPhone,
+    buttons: buttons.map((b) => ({
+      id: b.id,
+      user_id: b.userId,
+      button_key: b.buttonKey,
+      label: b.label,
+      is_visible: b.isVisible,
+      sort_order: b.sortOrder,
+      is_primary: b.isPrimary,
+    })),
   });
 }
 
@@ -50,6 +61,7 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: dbUserResult.error }, { status: dbUserResult.status });
   }
 
+  const userId = dbUserResult.user.id;
   const body = await request.json();
   const parsed = homeSettingsSchema.safeParse(body);
 
@@ -60,9 +72,7 @@ export async function PUT(request: Request) {
     );
   }
 
-  const userId = dbUserResult.user.id;
-
-  const settings = await prisma.homeScreenSettings.upsert({
+  await prisma.homeScreenSettings.upsert({
     where: { userId },
     create: {
       userId,
@@ -79,38 +89,30 @@ export async function PUT(request: Request) {
     },
   });
 
-  // Delete existing buttons and recreate
-  await prisma.homeScreenButton.deleteMany({ where: { userId } });
-
-  if (parsed.data.buttons.length > 0) {
-    await prisma.homeScreenButton.createMany({
-      data: parsed.data.buttons.map((b) => ({
+  for (const button of parsed.data.buttons) {
+    await prisma.homeScreenButton.upsert({
+      where: {
+        userId_buttonKey: {
+          userId,
+          buttonKey: button.button_key,
+        },
+      },
+      create: {
         userId,
-        buttonKey: b.button_key,
-        label: b.label,
-        isVisible: b.is_visible,
-        sortOrder: b.sort_order,
-        isPrimary: b.is_primary,
-      })),
+        buttonKey: button.button_key,
+        label: button.label,
+        isVisible: button.is_visible,
+        sortOrder: button.sort_order,
+        isPrimary: button.is_primary,
+      },
+      update: {
+        label: button.label,
+        isVisible: button.is_visible,
+        sortOrder: button.sort_order,
+        isPrimary: button.is_primary,
+      },
     });
   }
 
-  const buttons = await prisma.homeScreenButton.findMany({
-    where: { userId },
-    orderBy: { sortOrder: 'asc' },
-  });
-
-  return NextResponse.json({
-    simplicity_level: settings.simplicityLevel,
-    today_message: settings.todayMessage,
-    emergency_contact_name: settings.emergencyContactName,
-    emergency_contact_phone: settings.emergencyContactPhone,
-    buttons: buttons.map((b) => ({
-      button_key: b.buttonKey,
-      label: b.label,
-      is_visible: b.isVisible,
-      sort_order: b.sortOrder,
-      is_primary: b.isPrimary,
-    })),
-  });
+  return NextResponse.json({ success: true });
 }
