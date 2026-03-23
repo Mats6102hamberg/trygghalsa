@@ -16,9 +16,9 @@ const buttonMeta: Record<string, { emoji: string; href: string; description: str
   medications: { emoji: '\uD83D\uDC8A', href: '/dashboard/medications', description: 'Se dina mediciner' },
   health: { emoji: '\u2764\uFE0F', href: '/dashboard/health', description: 'Se din hälsa' },
   appointments: { emoji: '\uD83D\uDCC5', href: '/dashboard/appointments', description: 'Se nästa besök' },
-  help: { emoji: '\uD83C\uDD98', href: '/dashboard/questions', description: 'Få hjälp snabbt' },
+  help: { emoji: '\uD83C\uDD98', href: '/dashboard/help', description: 'Få hjälp snabbt' },
   questions: { emoji: '\uD83E\uDDE0', href: '/dashboard/questions', description: 'Se frågor till läkaren' },
-  timeline: { emoji: '\uD83D\uDCD6', href: '/dashboard', description: 'Se vad som hänt tidigare' },
+  timeline: { emoji: '\uD83D\uDCD6', href: '/dashboard/timeline', description: 'Se vad som hänt tidigare' },
   contact_family: { emoji: '\uD83D\uDCDE', href: '/dashboard/caregiver', description: 'Kontakta anhörig' },
 };
 
