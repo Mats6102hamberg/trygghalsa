@@ -54,5 +54,6 @@ model HealthImport {
   @@index([userId])
   @@index([source])
   @@index([externalType])
+  @@index([userId, externalType, occurredAt])
   @@map("health_imports")
 }

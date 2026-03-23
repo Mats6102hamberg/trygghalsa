@@ -26,3 +26,16 @@ export type AISummary = {
   summary: string;
   questions: string[];
 };
+
+export type HealthSource = 'apple_health' | 'health_connect';
+
+export type HealthMetricType = 'steps' | 'heart_rate' | 'blood_pressure' | 'sleep';
+
+export type ImportedHealthMetric = {
+  source: HealthSource;
+  metricType: HealthMetricType;
+  occurredAt: string;
+  value: number | string;
+  unit?: string;
+  metadata?: Record<string, unknown>;
+};
