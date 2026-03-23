@@ -1,4 +1,4 @@
-export type EventType = 'visit' | 'diagnosis' | 'medication' | 'test' | 'vaccine';
+export type EventType = 'visit' | 'diagnosis' | 'medication' | 'test' | 'vaccine' | 'note';
 
 export type Attachment = {
   url: string;

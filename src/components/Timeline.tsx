@@ -11,6 +11,7 @@ const typeLabels: Record<string, string> = {
   medication: 'Läkemedel',
   test: 'Prov/Test',
   vaccine: 'Vaccin',
+  note: 'Anteckning',
 };
 
 const typeColors: Record<string, string> = {
@@ -19,6 +20,7 @@ const typeColors: Record<string, string> = {
   medication: 'bg-green-100 text-green-800',
   test: 'bg-yellow-100 text-yellow-800',
   vaccine: 'bg-purple-100 text-purple-800',
+  note: 'bg-gray-100 text-gray-800',
 };
 
 export function Timeline({ initialEvents }: { initialEvents?: Event[] }) {

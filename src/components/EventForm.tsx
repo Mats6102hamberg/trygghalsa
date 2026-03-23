@@ -10,6 +10,7 @@ const eventTypes = [
   { value: 'medication', label: 'Läkemedel' },
   { value: 'test', label: 'Prov/Test' },
   { value: 'vaccine', label: 'Vaccin' },
+  { value: 'note', label: 'Anteckning' },
 ];
 
 export function EventForm({ event }: { event?: Partial<Event> }) {
