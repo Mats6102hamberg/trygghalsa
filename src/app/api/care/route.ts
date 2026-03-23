@@ -74,6 +74,7 @@ export async function POST(request: Request) {
       userId: dbUserResult.user.id,
       caregiverUserId: caregiverUser.id,
       relationshipType: parsed.data.relationshipType ?? 'anhörig',
+      status: 'active',
     },
   });
 

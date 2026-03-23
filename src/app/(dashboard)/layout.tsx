@@ -36,6 +36,9 @@ export default async function DashboardLayout({
                 <Link href="/dashboard/questions" className="text-sm text-gray-600 hover:text-gray-900">
                   Frågor
                 </Link>
+                <Link href="/dashboard/care" className="text-sm text-gray-600 hover:text-gray-900">
+                  Anhörig
+                </Link>
                 <Link href="/dashboard/settings" className="text-sm text-gray-600 hover:text-gray-900">
                   Inställningar
                 </Link>
