@@ -19,8 +19,14 @@ export default function DashboardLayout({
                 <Link href="/dashboard" className="text-sm text-gray-600 hover:text-gray-900">
                   Tidslinje
                 </Link>
-                <Link href="/dashboard/events/new" className="text-sm text-gray-600 hover:text-gray-900">
-                  Ny händelse
+                <Link href="/dashboard/medications" className="text-sm text-gray-600 hover:text-gray-900">
+                  Mediciner
+                </Link>
+                <Link href="/dashboard/appointments" className="text-sm text-gray-600 hover:text-gray-900">
+                  Bokningar
+                </Link>
+                <Link href="/dashboard/questions" className="text-sm text-gray-600 hover:text-gray-900">
+                  Frågor
                 </Link>
                 <Link href="/dashboard/settings" className="text-sm text-gray-600 hover:text-gray-900">
                   Inställningar

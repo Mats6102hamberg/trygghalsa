@@ -3,6 +3,7 @@ import { getOrCreateDbUser } from '@/lib/auth/getOrCreateUser';
 import { redirect } from 'next/navigation';
 import { Timeline } from '@/components/Timeline';
 import { AISummary } from '@/components/AISummary';
+import { ImportantToday } from '@/components/ImportantToday';
 import Link from 'next/link';
 import type { Event } from '@/types';
 
@@ -42,6 +43,8 @@ export default async function DashboardPage() {
           Lägg till händelse
         </Link>
       </div>
+
+      <ImportantToday />
 
       {events.length > 0 && <AISummary />}
 

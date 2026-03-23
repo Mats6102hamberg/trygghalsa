@@ -15,6 +15,9 @@ model User {
   updatedAt     DateTime       @updatedAt @map("updated_at")
   events        Event[]
   healthImports HealthImport[]
+  medications   Medication[]
+  appointments  Appointment[]
+  questions     Question[]
 
   @@map("users")
 }
@@ -56,4 +59,64 @@ model HealthImport {
   @@index([externalType])
   @@index([userId, externalType, occurredAt])
   @@map("health_imports")
+}
+
+model Medication {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  name         String
+  dosage       String?
+  frequency    String?
+  startDate    String   @map("start_date")
+  endDate      String?  @map("end_date")
+  notes        String?
+  reminderTime String?  @map("reminder_time")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isActive])
+  @@map("medications")
+}
+
+model Appointment {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  title        String
+  dateTime     DateTime @map("date_time") @db.Timestamptz
+  providerName String?  @map("provider_name")
+  location     String?
+  notes        String?
+  status       String   @default("scheduled")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  questions Question[]
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, status])
+  @@map("appointments")
+}
+
+model Question {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  text          String
+  source        String   @default("manual")
+  appointmentId String?  @map("appointment_id")
+  isAnswered    Boolean  @default(false) @map("is_answered")
+  answer        String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([appointmentId])
+  @@map("questions")
 }
