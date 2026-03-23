@@ -14,7 +14,7 @@ interface TodayData {
 
 const buttonMeta: Record<string, { emoji: string; href: string; description: string }> = {
   medications: { emoji: '\uD83D\uDC8A', href: '/dashboard/medications', description: 'Se dina mediciner' },
-  health: { emoji: '\u2764\uFE0F', href: '/dashboard', description: 'Se din hälsa' },
+  health: { emoji: '\u2764\uFE0F', href: '/dashboard/health', description: 'Se din hälsa' },
   appointments: { emoji: '\uD83D\uDCC5', href: '/dashboard/appointments', description: 'Se nästa besök' },
   help: { emoji: '\uD83C\uDD98', href: '/dashboard/questions', description: 'Få hjälp snabbt' },
   questions: { emoji: '\uD83E\uDDE0', href: '/dashboard/questions', description: 'Se frågor till läkaren' },
@@ -35,7 +35,7 @@ function getGreeting(): string {
   return 'God kväll';
 }
 
-export default function HomeDashboard({ userName }: { userName?: string }) {
+export default function HomeDashboard() {
   const [settings, setSettings] = useState<HomeScreenSettings | null>(null);
   const [todayData, setTodayData] = useState<TodayData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -131,7 +131,7 @@ export default function HomeDashboard({ userName }: { userName?: string }) {
 
   const today = format(new Date(), 'EEEE d MMMM', { locale: sv });
   const greeting = getGreeting();
-  const displayName = userName || 'du';
+  const displayName = 'du';
 
   return (
     <div className="space-y-6">

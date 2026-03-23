@@ -30,17 +30,19 @@ export default async function MedicationsPage() {
   }));
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Mediciner</h1>
-        <Link
-          href="/dashboard/medications/new"
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
-          Lägg till
-        </Link>
+    <main className="min-h-screen bg-gray-50 p-6">
+      <div className="mx-auto max-w-2xl rounded-2xl border bg-white p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold">Mina mediciner</h1>
+          <Link
+            href="/dashboard/medications/new"
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            Lägg till
+          </Link>
+        </div>
+        <MedicationList initialMedications={medications} />
       </div>
-      <MedicationList initialMedications={medications} />
-    </div>
+    </main>
   );
 }
