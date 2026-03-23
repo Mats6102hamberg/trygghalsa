@@ -64,7 +64,7 @@ export default function MedicationsPage() {
     <main className="min-h-screen bg-gray-50 p-6">
       <div className="mx-auto max-w-2xl space-y-6">
         <div className="rounded-2xl border bg-white p-6 shadow-sm">
-          <h1 className="text-2xl font-bold">Mina mediciner</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Mina mediciner</h1>
           <p className="mt-2 text-gray-600">
             Här ser du dina mediciner för idag.
           </p>

@@ -35,7 +35,7 @@ export default function MedicationCard({ medication, onTaken }: Props) {
                 className="flex items-center justify-between rounded-xl border p-4"
               >
                 <div>
-                  <div className="text-lg font-semibold">{time}</div>
+                  <div className="text-lg font-semibold text-gray-900">{time}</div>
                   <div className="text-sm text-gray-500">
                     {isTaken ? 'Tagen idag' : 'Inte markerad ännu'}
                   </div>
