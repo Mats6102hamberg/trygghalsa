@@ -57,8 +57,19 @@ export async function GET(request: Request) {
 
   const logs = await prisma.medicationLog.findMany({
     where,
+    include: { medication: { select: { name: true, dosage: true } } },
     orderBy: { takenAt: 'desc' },
   });
 
-  return NextResponse.json(logs);
+  const result = logs.map((l) => ({
+    id: l.id,
+    medication_id: l.medicationId,
+    medication_name: l.medication.name,
+    dosage: l.medication.dosage,
+    scheduled_time: l.scheduledTime,
+    taken_at: l.takenAt.toISOString(),
+    created_at: l.createdAt.toISOString(),
+  }));
+
+  return NextResponse.json(result);
 }

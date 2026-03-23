@@ -24,7 +24,7 @@ export default async function DashboardLayout({
                 TryggHälsa
               </Link>
               <div className="hidden sm:flex gap-6">
-                <Link href="/dashboard" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/dashboard/timeline" className="text-sm text-gray-600 hover:text-gray-900">
                   Tidslinje
                 </Link>
                 <Link href="/dashboard/medications" className="text-sm text-gray-600 hover:text-gray-900">
