@@ -1,3 +1,7 @@
+'use client';
+
+import { useState } from 'react';
+
 type PremiumCardProps = {
   title?: string;
   text?: string;
@@ -9,6 +13,22 @@ export default function PremiumCard({
   text = 'Bjud in anhöriga, se anhörigöversikt och få dagliga sammanfattningar med Premium.',
   buttonText = 'Uppgradera',
 }: PremiumCardProps) {
+  const [loading, setLoading] = useState(false);
+
+  async function handleUpgrade() {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/stripe/checkout', { method: 'POST' });
+      const data = await res.json();
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="rounded-2xl border border-amber-300 bg-amber-50 p-5 shadow-sm">
       <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
@@ -21,10 +41,12 @@ export default function PremiumCard({
       </div>
 
       <button
-        className="mt-5 rounded-xl bg-gray-900 px-4 py-2 text-white hover:bg-gray-800 transition"
+        onClick={handleUpgrade}
+        disabled={loading}
+        className="mt-5 rounded-xl bg-gray-900 px-4 py-2 text-white hover:bg-gray-800 transition disabled:opacity-50"
         type="button"
       >
-        {buttonText}
+        {loading ? 'Laddar...' : buttonText}
       </button>
     </div>
   );
