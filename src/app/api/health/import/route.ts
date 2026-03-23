@@ -14,24 +14,60 @@ export async function POST(request: Request) {
 
   if (!parsed.success) {
     return NextResponse.json(
-      { error: 'Invalid input', details: parsed.error.flatten() },
+      { error: 'Invalid import payload', details: parsed.error.flatten() },
       { status: 400 }
     );
   }
 
-  const created = await prisma.healthImport.createMany({
-    data: parsed.data.entries.map((entry) => ({
+  const importJob = await prisma.importJob.create({
+    data: {
       userId: dbUserResult.user.id,
-      source: parsed.data.source,
-      externalType: entry.metricType,
-      occurredAt: new Date(entry.occurredAt),
-      payload: JSON.parse(JSON.stringify({
-        value: entry.value,
-        unit: entry.unit ?? null,
-        metadata: entry.metadata ?? {},
-      })),
-    })),
+      source: 'health_import',
+      status: 'processing',
+    },
   });
 
-  return NextResponse.json({ imported: created.count }, { status: 201 });
+  try {
+    const rows = parsed.data.entries.map((entry) => ({
+      userId: dbUserResult.user.id,
+      source: parsed.data.source,
+      metricType: entry.metricType,
+      occurredAt: new Date(entry.occurredAt),
+      valueNumeric: typeof entry.value === 'number' ? entry.value : null,
+      valueText: typeof entry.value === 'string' ? entry.value : null,
+      unit: entry.unit ?? null,
+      metadata: JSON.parse(JSON.stringify(entry.metadata ?? {})),
+    }));
+
+    const result = await prisma.healthMetric.createMany({ data: rows });
+
+    await prisma.importJob.update({
+      where: { id: importJob.id },
+      data: {
+        status: 'completed',
+        importedCount: result.count,
+        finishedAt: new Date(),
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      imported: result.count,
+      importJobId: importJob.id,
+    }, { status: 201 });
+  } catch (err) {
+    await prisma.importJob.update({
+      where: { id: importJob.id },
+      data: {
+        status: 'failed',
+        errorMessage: err instanceof Error ? err.message : 'Unknown error',
+        finishedAt: new Date(),
+      },
+    });
+
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : 'Import failed' },
+      { status: 500 }
+    );
+  }
 }

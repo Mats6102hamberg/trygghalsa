@@ -14,7 +14,8 @@ model User {
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
   events        Event[]
-  healthImports HealthImport[]
+  healthMetrics HealthMetric[]
+  importJobs    ImportJob[]
   medications   Medication[]
   appointments  Appointment[]
   questions     Question[]
@@ -43,22 +44,41 @@ model Event {
   @@map("events")
 }
 
-model HealthImport {
+model HealthMetric {
   id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId       String   @map("user_id")
   source       String
-  externalType String   @map("external_type")
+  metricType   String   @map("metric_type")
   occurredAt   DateTime @map("occurred_at") @db.Timestamptz
-  payload      Json
+  valueNumeric Float?   @map("value_numeric")
+  valueText    String?  @map("value_text")
+  unit         String?
+  metadata     Json     @default("{}")
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([source])
-  @@index([externalType])
-  @@index([userId, externalType, occurredAt])
-  @@map("health_imports")
+  @@index([metricType])
+  @@index([userId, metricType, occurredAt])
+  @@map("health_metrics")
+}
+
+model ImportJob {
+  id            String    @id @default(cuid())
+  userId        String    @map("user_id")
+  source        String
+  status        String    @default("processing")
+  importedCount Int       @default(0) @map("imported_count")
+  errorMessage  String?   @map("error_message")
+  finishedAt    DateTime? @map("finished_at") @db.Timestamptz
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("import_jobs")
 }
 
 model Medication {
