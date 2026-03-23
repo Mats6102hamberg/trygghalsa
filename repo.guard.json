@@ -1,0 +1,6 @@
+{
+  "project": "trygghalsa",
+  "allowedBranches": ["main"],
+  "requiredOriginContains": ["trygghalsa"],
+  "blockIfDirty": false
+}
