@@ -70,7 +70,7 @@ export default function CaregiverPanelPage() {
     <main className="min-h-screen bg-gray-50 p-6">
       <div className="mx-auto max-w-2xl space-y-6">
         <div className="rounded-2xl border bg-white p-6">
-          <h1 className="text-2xl font-bold">Anhörigpanel</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Anhörigpanel</h1>
           <p className="mt-2 text-sm text-gray-600">
             Anpassa vilka knappar som ska visas på användarens startsida.
           </p>
