@@ -1,8 +1,8 @@
 import { prisma } from '@/lib/db';
 import { getOrCreateDbUser } from '@/lib/auth/getOrCreateUser';
 import { redirect } from 'next/navigation';
-import { Timeline } from '@/components/Timeline';
-import { AISummary } from '@/components/AISummary';
+import Timeline from '@/components/Timeline';
+import AISummary from '@/components/AISummary';
 import { ImportantToday } from '@/components/ImportantToday';
 import Link from 'next/link';
 import type { Event } from '@/types';
@@ -13,7 +13,7 @@ export default async function DashboardPage() {
 
   const rawEvents = await prisma.event.findMany({
     where: { userId: dbUserResult.user.id },
-    orderBy: { date: 'desc' },
+    orderBy: { date: 'asc' },
   });
 
   const events: Event[] = rawEvents.map((e) => ({
@@ -33,22 +33,28 @@ export default async function DashboardPage() {
   }));
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Din hälsotidslinje</h1>
-        <Link
-          href="/dashboard/events/new"
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
-          Lägg till händelse
-        </Link>
+    <main className="min-h-screen bg-gray-50 p-6">
+      <div className="mx-auto max-w-4xl space-y-6">
+        <div className="flex flex-col justify-between gap-4 rounded-2xl border bg-white p-6 sm:flex-row sm:items-center">
+          <div>
+            <h1 className="text-2xl font-bold">TryggHälsa</h1>
+            <p className="mt-2 text-sm text-gray-600">
+              Samla din medicinska historik, skapa överblick och förbered dig inför vårdbesök.
+            </p>
+          </div>
+
+          <Link
+            href="/dashboard/events/new"
+            className="rounded-lg bg-blue-600 px-4 py-2 text-center text-white"
+          >
+            Lägg till händelse
+          </Link>
+        </div>
+
+        <ImportantToday />
+        <AISummary />
+        <Timeline initialEvents={events} />
       </div>
-
-      <ImportantToday />
-
-      {events.length > 0 && <AISummary />}
-
-      <Timeline initialEvents={events} />
-    </div>
+    </main>
   );
 }
