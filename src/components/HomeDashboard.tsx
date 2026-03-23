@@ -19,7 +19,7 @@ const buttonMeta: Record<string, { emoji: string; href: string; description: str
   help: { emoji: '\uD83C\uDD98', href: '/dashboard/help', description: 'Få hjälp snabbt' },
   questions: { emoji: '\uD83E\uDDE0', href: '/dashboard/questions', description: 'Se frågor till läkaren' },
   timeline: { emoji: '\uD83D\uDCD6', href: '/dashboard/timeline', description: 'Se vad som hänt tidigare' },
-  contact_family: { emoji: '\uD83D\uDCDE', href: '/dashboard/caregiver', description: 'Kontakta anhörig' },
+  contact_family: { emoji: '\uD83D\uDCDE', href: '/dashboard/contact-family', description: 'Kontakta anhörig' },
 };
 
 const maxButtonsByLevel: Record<string, number> = {

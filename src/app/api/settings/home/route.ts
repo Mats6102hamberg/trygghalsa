@@ -23,12 +23,13 @@ export async function GET() {
       },
     });
 
-    await prisma.homeScreenButton.createMany({
-      data: defaultButtons.map((b) => ({
-        userId,
-        ...b,
-      })),
-    });
+    for (const b of defaultButtons) {
+      await prisma.homeScreenButton.upsert({
+        where: { userId_buttonKey: { userId, buttonKey: b.buttonKey } },
+        create: { userId, ...b },
+        update: {},
+      });
+    }
   }
 
   const buttons = await prisma.homeScreenButton.findMany({
