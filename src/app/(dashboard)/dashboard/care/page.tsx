@@ -97,17 +97,13 @@ export default function CarePage() {
             </p>
           </div>
 
-          <PremiumCard />
-
-          <div className="rounded-2xl border bg-white p-5">
-            <h2 className="text-lg font-semibold text-gray-900">Det här ingår i Premium</h2>
-            <ul className="mt-3 space-y-2 text-sm text-gray-700">
-              <li>Bjud in anhöriga</li>
-              <li>Se status: OK / Varning / Alert</li>
-              <li>Få dagliga sammanfattningar</li>
-              <li>Anhörigöversikt på ett ställe</li>
-            </ul>
+          <div className="rounded-xl bg-yellow-50 border border-yellow-200 p-4">
+            <p className="text-sm text-yellow-800">
+              Du använder gratisversionen. Uppgradera för att dela med anhöriga och få full överblick.
+            </p>
           </div>
+
+          <PremiumCard />
         </div>
       </main>
     );

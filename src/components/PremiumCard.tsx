@@ -2,17 +2,7 @@
 
 import { useState } from 'react';
 
-type PremiumCardProps = {
-  title?: string;
-  text?: string;
-  buttonText?: string;
-};
-
-export default function PremiumCard({
-  title = 'Premium krävs',
-  text = 'Bjud in anhöriga, se anhörigöversikt och få dagliga sammanfattningar med Premium.',
-  buttonText = 'Uppgradera',
-}: PremiumCardProps) {
+export default function PremiumCard() {
   const [loading, setLoading] = useState(false);
 
   async function handleUpgrade() {
@@ -30,24 +20,36 @@ export default function PremiumCard({
   }
 
   return (
-    <div className="rounded-2xl border border-amber-300 bg-amber-50 p-5 shadow-sm">
-      <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-      <p className="mt-2 text-sm text-gray-700">{text}</p>
+    <div className="rounded-2xl border border-amber-300 bg-amber-50 p-6 shadow-sm">
+      <h2 className="text-lg font-semibold text-gray-900">
+        Få trygghet för dig och din familj
+      </h2>
+      <p className="mt-2 text-sm text-gray-700">
+        Med Premium kan du enkelt följa hur dina nära mår, se om mediciner tagits och få varningar om något inte stämmer.
+      </p>
 
-      <div className="mt-4 flex flex-wrap gap-2 text-sm text-gray-600">
-        <span className="rounded-full bg-white px-3 py-1 border">Anhörigöversikt</span>
-        <span className="rounded-full bg-white px-3 py-1 border">Statusvarningar</span>
-        <span className="rounded-full bg-white px-3 py-1 border">Sammanfattningar</span>
+      <ul className="mt-3 space-y-2 text-sm text-gray-700">
+        <li>Se om allt verkar vara okej</li>
+        <li>Få varning om medicin missas</li>
+        <li>Dela överblick med familjen</li>
+        <li>Dagliga sammanfattningar</li>
+      </ul>
+
+      <div className="mt-5">
+        <p className="text-lg font-semibold text-gray-900">99 kr / månad</p>
+        <button
+          onClick={handleUpgrade}
+          disabled={loading}
+          className="mt-3 w-full rounded-xl bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition disabled:opacity-50"
+          type="button"
+        >
+          {loading ? 'Laddar...' : 'Uppgradera till Premium'}
+        </button>
       </div>
 
-      <button
-        onClick={handleUpgrade}
-        disabled={loading}
-        className="mt-5 rounded-xl bg-gray-900 px-4 py-2 text-white hover:bg-gray-800 transition disabled:opacity-50"
-        type="button"
-      >
-        {loading ? 'Laddar...' : buttonText}
-      </button>
+      <p className="mt-4 text-sm text-gray-600">
+        Tips: Bjud in en anhörig direkt för att börja dela överblicken.
+      </p>
     </div>
   );
 }
