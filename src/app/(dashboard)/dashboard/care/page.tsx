@@ -1,25 +1,26 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import PremiumCard from '@/components/PremiumCard';
 
-interface Dependent {
+type Dependent = {
   id: string;
   name: string;
   relationship: string;
   status: 'ok' | 'warning' | 'alert';
   summary: string;
-}
-
-const statusConfig = {
-  ok: { bg: 'bg-green-50 border-green-200', dot: 'bg-green-500', label: 'Allt OK' },
-  warning: { bg: 'bg-yellow-50 border-yellow-200', dot: 'bg-yellow-500', label: 'Varning' },
-  alert: { bg: 'bg-red-50 border-red-200', dot: 'bg-red-500', label: 'Uppmärksamma' },
 };
 
-export default function CareDashboardPage() {
+type BillingStatus = {
+  plan: string;
+  planStatus: string;
+  isPremium: boolean;
+};
+
+export default function CarePage() {
+  const [billing, setBilling] = useState<BillingStatus | null>(null);
   const [dependents, setDependents] = useState<Dependent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   // Invite state
   const [inviteEmail, setInviteEmail] = useState('');
@@ -27,18 +28,23 @@ export default function CareDashboardPage() {
   const [inviteMessage, setInviteMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    loadOverview();
+    loadData();
   }, []);
 
-  async function loadOverview() {
+  async function loadData() {
     try {
       setLoading(true);
-      const res = await fetch('/api/care/overview');
-      if (!res.ok) throw new Error('Kunde inte hämta översikt.');
-      const data = await res.json();
-      setDependents(data.dependents);
+      const billingRes = await fetch('/api/billing/status');
+      const billingData = await billingRes.json();
+      setBilling(billingData);
+
+      if (billingData.isPremium) {
+        const careRes = await fetch('/api/care/overview');
+        const careData = await careRes.json();
+        setDependents(careData.dependents || []);
+      }
     } catch {
-      setError('Kunde inte hämta anhörigöversikt.');
+      console.error('Failed to load care page');
     } finally {
       setLoading(false);
     }
@@ -67,7 +73,7 @@ export default function CareDashboardPage() {
 
       setInviteMessage('Anhörig kopplad!');
       setInviteEmail('');
-      loadOverview();
+      loadData();
     } catch {
       setInviteMessage('Kunde inte bjuda in anhörig.');
     } finally {
@@ -75,45 +81,80 @@ export default function CareDashboardPage() {
     }
   }
 
+  if (loading) {
+    return <div className="p-6 text-gray-700">Laddar...</div>;
+  }
+
+  // Free user — show premium gate
+  if (!billing?.isPremium) {
+    return (
+      <main className="min-h-screen bg-gray-50 p-6">
+        <div className="mx-auto max-w-2xl space-y-6">
+          <div className="rounded-2xl border bg-white p-6 shadow-sm">
+            <h1 className="text-2xl font-bold text-gray-900">Anhörig</h1>
+            <p className="mt-2 text-gray-600">
+              Här kan du dela trygg överblick med familjen och låta anhöriga se om allt verkar okej.
+            </p>
+          </div>
+
+          <PremiumCard />
+
+          <div className="rounded-2xl border bg-white p-5">
+            <h2 className="text-lg font-semibold text-gray-900">Det här ingår i Premium</h2>
+            <ul className="mt-3 space-y-2 text-sm text-gray-700">
+              <li>Bjud in anhöriga</li>
+              <li>Se status: OK / Varning / Alert</li>
+              <li>Få dagliga sammanfattningar</li>
+              <li>Anhörigöversikt på ett ställe</li>
+            </ul>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // Premium user — show full care dashboard
   return (
     <main className="min-h-screen bg-gray-50 p-6">
       <div className="mx-auto max-w-2xl space-y-6">
         <div className="rounded-2xl border bg-white p-6 shadow-sm">
-          <h1 className="text-2xl font-bold text-gray-900">Anhörigöversikt</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Anhörig</h1>
           <p className="mt-2 text-gray-600">
-            Se hur det går för dina närstående idag.
+            Överblick för anhöriga med status, sammanfattningar och uppföljning.
           </p>
         </div>
 
-        {error && (
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>
-        )}
+        <div className="rounded-2xl border border-green-200 bg-green-50 p-4">
+          <p className="text-sm font-medium text-green-800">Premium aktivt</p>
+        </div>
 
-        {loading ? (
-          <div className="rounded-2xl border bg-white p-6">Laddar...</div>
-        ) : dependents.length === 0 ? (
-          <div className="rounded-2xl border bg-white p-6 text-gray-500">
-            Du har inga kopplade närstående ännu.
+        {dependents.length === 0 ? (
+          <div className="rounded-2xl border bg-white p-5 text-gray-500">
+            Inga anhörigkopplingar ännu.
           </div>
         ) : (
-          dependents.map((dep) => {
-            const config = statusConfig[dep.status];
-            return (
-              <div key={dep.id} className={`rounded-2xl border p-5 shadow-sm ${config.bg}`}>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-900">{dep.name}</h2>
-                    <p className="text-sm text-gray-500">{dep.relationship}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`h-3 w-3 rounded-full ${config.dot}`} />
-                    <span className="text-sm font-medium text-gray-700">{config.label}</span>
-                  </div>
+          dependents.map((dep) => (
+            <div key={dep.id} className="rounded-2xl border bg-white p-5 shadow-sm">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">{dep.name}</h2>
+                  <p className="text-sm text-gray-500">{dep.relationship}</p>
                 </div>
-                <p className="mt-3 text-gray-700">{dep.summary}</p>
+                <span
+                  className={`rounded-full px-3 py-1 text-sm font-medium ${
+                    dep.status === 'ok'
+                      ? 'bg-green-100 text-green-700'
+                      : dep.status === 'warning'
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : 'bg-red-100 text-red-700'
+                  }`}
+                >
+                  {dep.status === 'ok' ? 'OK' : dep.status === 'warning' ? 'Varning' : 'Alert'}
+                </span>
               </div>
-            );
-          })
+              <p className="mt-3 text-sm text-gray-700">{dep.summary}</p>
+            </div>
+          ))
         )}
 
         {/* Invite form */}
@@ -144,14 +185,6 @@ export default function CareDashboardPage() {
           {inviteMessage && (
             <p className="mt-2 text-sm text-gray-700">{inviteMessage}</p>
           )}
-        </div>
-
-        {/* Premium hint */}
-        <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5">
-          <p className="text-sm font-medium text-blue-900">
-            Premium: Dela med familjen och få dagliga sammanfattningar.
-          </p>
-          <p className="mt-1 text-xs text-blue-700">Kommer snart.</p>
         </div>
       </div>
     </main>
