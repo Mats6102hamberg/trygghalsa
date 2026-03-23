@@ -2,10 +2,9 @@ import { prisma } from '@/lib/db';
 import { getOrCreateDbUser } from '@/lib/auth/getOrCreateUser';
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import Timeline from '@/components/Timeline';
+import HomeDashboard from '@/components/HomeDashboard';
 import AISummary from '@/components/AISummary';
-import { ImportantToday } from '@/components/ImportantToday';
-import { QuickActions } from '@/components/QuickActions';
+import Timeline from '@/components/Timeline';
 import type { Event } from '@/types';
 
 export default async function DashboardPage() {
@@ -39,8 +38,7 @@ export default async function DashboardPage() {
   return (
     <main className="min-h-screen bg-gray-50 p-6">
       <div className="mx-auto max-w-md space-y-6">
-        <ImportantToday userName={firstName} />
-        <QuickActions />
+        <HomeDashboard userName={firstName} />
         <AISummary />
         <Timeline initialEvents={events} />
       </div>
