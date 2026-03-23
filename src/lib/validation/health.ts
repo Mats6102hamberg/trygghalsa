@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const healthSources = ['apple_health', 'health_connect'] as const;
-export const healthMetricTypes = ['steps', 'heart_rate', 'blood_pressure', 'sleep'] as const;
+export const healthMetricTypes = ['steps', 'heart_rate', 'blood_pressure', 'weight', 'sleep', 'height', 'bmi'] as const;
 
 export const healthEntrySchema = z.object({
   metricType: z.enum(healthMetricTypes),

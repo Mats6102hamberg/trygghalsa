@@ -22,22 +22,51 @@ export type Event = {
   updated_at: string;
 };
 
-export type AISummary = {
+export type AISummaryResponse = {
   summary: string;
   questions: string[];
 };
 
 export type HealthSource = 'apple_health' | 'health_connect';
 
-export type HealthMetricType = 'steps' | 'heart_rate' | 'blood_pressure' | 'sleep';
+export type HealthMetricType =
+  | 'steps'
+  | 'heart_rate'
+  | 'blood_pressure'
+  | 'weight'
+  | 'sleep'
+  | 'height'
+  | 'bmi';
 
-export type ImportedHealthMetric = {
+export type NormalizedHealthMetric = {
   source: HealthSource;
   metricType: HealthMetricType;
   occurredAt: string;
   value: number | string;
   unit?: string;
   metadata?: Record<string, unknown>;
+};
+
+export type HealthMetric = {
+  id: string;
+  user_id: string;
+  source: HealthSource;
+  metric_type: string;
+  occurred_at: string;
+  value_numeric: number | null;
+  value_text: string | null;
+  unit: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+};
+
+export type JournalDraftEvent = {
+  date: string | null;
+  type: EventType;
+  title: string;
+  description: string | null;
+  confidence: 'high' | 'medium' | 'low';
+  source_excerpt: string;
 };
 
 export type Medication = {
