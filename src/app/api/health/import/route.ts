@@ -3,19 +3,17 @@ import { prisma } from '@/lib/db';
 import { getOrCreateDbUser } from '@/lib/auth/getOrCreateUser';
 import { z } from 'zod';
 
-const healthEventSchema = z.object({
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  type: z.enum(['visit', 'diagnosis', 'medication', 'test', 'vaccine']),
-  title: z.string().min(1).max(200),
-  description: z.string().max(5000).optional().nullable(),
-  providerName: z.string().max(200).optional().nullable(),
-  location: z.string().max(200).optional().nullable(),
-  tags: z.array(z.string()).optional().default([]),
-  source: z.string().optional().default('healthkit'),
-});
-
-const importSchema = z.object({
-  events: z.array(healthEventSchema).min(1).max(100),
+const healthImportSchema = z.object({
+  source: z.enum(['healthkit', 'health_connect']),
+  entries: z.array(
+    z.object({
+      externalType: z.string().min(1),
+      occurredAt: z.string().datetime(),
+      value: z.union([z.string(), z.number(), z.boolean(), z.object({}).passthrough()]),
+      unit: z.string().optional(),
+      metadata: z.record(z.string(), z.any()).optional(),
+    })
+  ).min(1),
 });
 
 export async function POST(request: Request) {
@@ -25,7 +23,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const parsed = importSchema.safeParse(body);
+  const parsed = healthImportSchema.safeParse(body);
 
   if (!parsed.success) {
     return NextResponse.json(
@@ -34,18 +32,17 @@ export async function POST(request: Request) {
     );
   }
 
-  const created = await prisma.event.createMany({
-    data: parsed.data.events.map((e) => ({
+  const created = await prisma.healthImport.createMany({
+    data: parsed.data.entries.map((entry) => ({
       userId: dbUserResult.user.id,
-      date: e.date,
-      type: e.type,
-      title: e.title,
-      description: e.description ?? null,
-      providerName: e.providerName ?? null,
-      location: e.location ?? null,
-      tags: [...e.tags, `source:${e.source}`],
-      isPrivate: true,
-      attachments: [],
+      source: parsed.data.source,
+      externalType: entry.externalType,
+      occurredAt: new Date(entry.occurredAt),
+      payload: JSON.parse(JSON.stringify({
+        value: entry.value,
+        unit: entry.unit ?? null,
+        metadata: entry.metadata ?? {},
+      })),
     })),
   });
 
