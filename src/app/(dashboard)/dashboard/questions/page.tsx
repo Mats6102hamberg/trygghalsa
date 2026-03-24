@@ -8,11 +8,22 @@ export default async function QuestionsPage() {
   const dbUserResult = await getOrCreateDbUser();
   if ('error' in dbUserResult) redirect('/sign-in');
 
-  const rawQuestions = await prisma.question.findMany({
-    where: { userId: dbUserResult.user.id },
-    orderBy: { createdAt: 'desc' },
-    include: { appointment: { select: { title: true } } },
-  });
+  const userId = dbUserResult.user.id;
+
+  const [rawQuestions, upcomingApts] = await Promise.all([
+    prisma.question.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.appointment.findMany({
+      where: {
+        userId,
+        status: 'scheduled',
+        dateTime: { gte: new Date() },
+      },
+      orderBy: { dateTime: 'asc' },
+    }),
+  ]);
 
   const questions: Question[] = rawQuestions.map((q) => ({
     id: q.id,
@@ -26,17 +37,21 @@ export default async function QuestionsPage() {
     updated_at: q.updatedAt.toISOString(),
   }));
 
-  const upcoming = await prisma.appointment.findMany({
-    where: {
-      userId: dbUserResult.user.id,
-      status: 'scheduled',
-      dateTime: { gte: new Date() },
-    },
-    orderBy: { dateTime: 'asc' },
-    take: 1,
-  });
+  const appointments = upcomingApts.map((a) => ({
+    id: a.id,
+    title: a.title,
+    date_time: a.dateTime.toISOString(),
+  }));
 
-  const nextAppointment = upcoming[0] ?? null;
+  const nextAppointment = upcomingApts[0] ?? null;
+
+  // Count questions per appointment for the badge
+  const questionCounts = new Map<string, number>();
+  for (const q of rawQuestions) {
+    if (q.appointmentId && !q.isAnswered) {
+      questionCounts.set(q.appointmentId, (questionCounts.get(q.appointmentId) ?? 0) + 1);
+    }
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 p-6">
@@ -56,13 +71,24 @@ export default async function QuestionsPage() {
                   day: 'numeric',
                   month: 'long',
                 })}
+                {(() => {
+                  const count = questionCounts.get(nextAppointment.id) ?? 0;
+                  return count > 0 ? (
+                    <span className="ml-2 inline-flex items-center rounded-full bg-blue-200 px-2 py-0.5 text-xs font-medium text-blue-900">
+                      {count} {count === 1 ? 'fråga' : 'frågor'} förberedda
+                    </span>
+                  ) : null;
+                })()}
               </p>
             </div>
           )}
         </div>
 
         <div className="rounded-2xl border bg-white p-6 shadow-sm">
-          <QuestionList initialQuestions={questions} />
+          <QuestionList
+            initialQuestions={questions}
+            appointments={appointments}
+          />
         </div>
       </div>
     </main>

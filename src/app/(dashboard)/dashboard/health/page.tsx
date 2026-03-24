@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db';
 import { getOrCreateDbUser } from '@/lib/auth/getOrCreateUser';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { HealthSummary } from '@/components/HealthSummary';
 
 const metricLabels: Record<string, string> = {
   steps: 'Steg',
@@ -70,6 +71,8 @@ export default async function HealthPage() {
           <h1 className="text-2xl font-bold text-gray-900">Min hälsa</h1>
           <p className="mt-2 text-gray-600">Översikt över din hälsa och vård.</p>
         </div>
+
+        <HealthSummary />
 
         {/* Diagnoser */}
         <section className="rounded-2xl border bg-white p-6 shadow-sm">
