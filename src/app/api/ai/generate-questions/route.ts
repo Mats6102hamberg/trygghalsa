@@ -2,9 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getOrCreateDbUser } from '@/lib/auth/getOrCreateUser';
 import { formatEventsTimeline } from '@/lib/format';
-import Anthropic from '@anthropic-ai/sdk';
-
-const anthropic = new Anthropic();
+import { callAI } from '@/lib/ai';
 
 export async function POST(request: Request) {
   const dbUserResult = await getOrCreateDbUser();
@@ -47,18 +45,15 @@ ${medicationList || 'Inga aktiva mediciner.'}
 Svara med en JSON-array av strängar:
 ["Fråga 1", "Fråga 2", ...]`;
 
-  const message = await anthropic.messages.create({
+  const result = await callAI({
     model: 'claude-sonnet-4-6',
     max_tokens: 1024,
     messages: [{ role: 'user', content: prompt }],
   });
 
-  const textBlock = message.content.find((b) => b.type === 'text');
-  if (!textBlock || textBlock.type !== 'text') {
-    return NextResponse.json({ error: 'Inget svar från AI' }, { status: 500 });
-  }
+  if (!result.ok) return result.response;
 
-  const questions: string[] = JSON.parse(textBlock.text);
+  const questions: string[] = JSON.parse(result.text);
 
   const created = await prisma.question.createMany({
     data: questions.map((text) => ({

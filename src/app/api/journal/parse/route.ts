@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getOrCreateDbUser } from '@/lib/auth/getOrCreateUser';
-import Anthropic from '@anthropic-ai/sdk';
-
-const anthropic = new Anthropic();
+import { callAI } from '@/lib/ai';
 
 export async function POST(request: Request) {
   const dbUserResult = await getOrCreateDbUser();
@@ -63,27 +61,17 @@ Svara ENBART i JSON:
   ]
 }`;
 
-  try {
-    const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 4096,
-      messages: [{ role: 'user', content: prompt }],
-    });
+  const result = await callAI({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 4096,
+    messages: [{ role: 'user', content: prompt }],
+  });
 
-    const textBlock = message.content.find((b) => b.type === 'text');
-    if (!textBlock || textBlock.type !== 'text') {
-      return NextResponse.json({ error: 'Inget svar från AI' }, { status: 500 });
-    }
+  if (!result.ok) return result.response;
 
-    const result = JSON.parse(textBlock.text);
-    return NextResponse.json({
-      success: true,
-      draftEvents: Array.isArray(result.events) ? result.events : [],
-    });
-  } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Journal parsing failed' },
-      { status: 500 }
-    );
-  }
+  const parsed = JSON.parse(result.text);
+  return NextResponse.json({
+    success: true,
+    draftEvents: Array.isArray(parsed.events) ? parsed.events : [],
+  });
 }

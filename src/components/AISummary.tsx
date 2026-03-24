@@ -17,11 +17,12 @@ export default function AISummary() {
         method: 'POST',
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        throw new Error('Kunde inte skapa sammanfattning.');
+        throw new Error(data.error ?? 'Kunde inte skapa sammanfattning.');
       }
 
-      const data = await res.json();
       setSummary(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Något gick fel.');

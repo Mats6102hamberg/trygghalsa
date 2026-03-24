@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getOrCreateDbUser } from '@/lib/auth/getOrCreateUser';
-import Anthropic from '@anthropic-ai/sdk';
-
-const anthropic = new Anthropic();
+import { callAI } from '@/lib/ai';
 
 export async function POST() {
   const dbUserResult = await getOrCreateDbUser();
@@ -90,23 +88,13 @@ ${parts.join('\n')}
 
 Skriv sammanfattningen direkt, utan JSON-format.`;
 
-  try {
-    const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 512,
-      messages: [{ role: 'user', content: prompt }],
-    });
+  const result = await callAI({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 512,
+    messages: [{ role: 'user', content: prompt }],
+  });
 
-    const textBlock = message.content.find((b) => b.type === 'text');
-    if (!textBlock || textBlock.type !== 'text') {
-      return NextResponse.json({ error: 'Inget svar från AI' }, { status: 500 });
-    }
+  if (!result.ok) return result.response;
 
-    return NextResponse.json({ summary: textBlock.text });
-  } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'AI request failed' },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json({ summary: result.text });
 }

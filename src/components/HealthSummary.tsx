@@ -13,8 +13,8 @@ export function HealthSummary() {
 
     try {
       const res = await fetch('/api/ai/health-summary', { method: 'POST' });
-      if (!res.ok) throw new Error('Kunde inte skapa sammanfattning.');
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Kunde inte skapa sammanfattning.');
       setSummary(data.summary);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Något gick fel.');
