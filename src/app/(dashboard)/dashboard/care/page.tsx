@@ -11,6 +11,13 @@ type Dependent = {
   summary: string;
 };
 
+type PendingInvite = {
+  id: string;
+  email: string;
+  status: string;
+  created_at: string;
+};
+
 type BillingStatus = {
   plan: string;
   planStatus: string;
@@ -20,6 +27,7 @@ type BillingStatus = {
 export default function CarePage() {
   const [billing, setBilling] = useState<BillingStatus | null>(null);
   const [dependents, setDependents] = useState<Dependent[]>([]);
+  const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Invite state
@@ -39,9 +47,14 @@ export default function CarePage() {
       setBilling(billingData);
 
       if (billingData.isPremium) {
-        const careRes = await fetch('/api/care/overview');
+        const [careRes, relRes] = await Promise.all([
+          fetch('/api/care/overview'),
+          fetch('/api/care'),
+        ]);
         const careData = await careRes.json();
+        const relData = await relRes.json();
         setDependents(careData.dependents || []);
+        setPendingInvites(relData.pending_invites || []);
       }
     } catch {
       console.error('Failed to load care page');
@@ -71,7 +84,11 @@ export default function CarePage() {
         return;
       }
 
-      setInviteMessage('Anhörig kopplad!');
+      if (data.type === 'linked') {
+        setInviteMessage('Anhörig kopplad!');
+      } else {
+        setInviteMessage('Inbjudan skickad via e-post!');
+      }
       setInviteEmail('');
       loadData();
     } catch {
@@ -151,6 +168,21 @@ export default function CarePage() {
               <p className="mt-3 text-sm text-gray-700">{dep.summary}</p>
             </div>
           ))
+        )}
+
+        {/* Pending invites */}
+        {pendingInvites.length > 0 && (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+            <h2 className="text-base font-semibold text-amber-900">Väntande inbjudningar</h2>
+            <div className="mt-3 space-y-2">
+              {pendingInvites.map((inv) => (
+                <div key={inv.id} className="flex items-center justify-between rounded-lg bg-white p-3 border border-amber-100">
+                  <span className="text-sm text-gray-700">{inv.email}</span>
+                  <span className="text-xs text-amber-600">Väntar på registrering</span>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Invite form */}

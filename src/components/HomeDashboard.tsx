@@ -52,6 +52,8 @@ export default function HomeDashboard() {
         const [settingsRes, todayRes] = await Promise.all([
           fetch('/api/settings/home', { signal: controller.signal }),
           fetch('/api/dashboard/today', { signal: controller.signal }),
+          // Silently accept any pending care invites for this user
+          fetch('/api/care/accept-invites', { method: 'POST', signal: controller.signal }).catch(() => {}),
         ]);
 
         if (!settingsRes.ok || !todayRes.ok) {

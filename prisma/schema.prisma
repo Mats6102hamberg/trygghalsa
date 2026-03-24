@@ -28,6 +28,7 @@ model User {
   homeScreenButtons  HomeScreenButton[]
   careRelationsAsUser      CareRelationship[] @relation("CareUser")
   careRelationsAsCaregiver CareRelationship[] @relation("Caregiver")
+  careInvites              CareInvite[]
 
   @@map("users")
 }
@@ -183,6 +184,24 @@ model CareRelationship {
   @@index([userId])
   @@index([caregiverUserId])
   @@map("care_relationships")
+}
+
+model CareInvite {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  inviterUserId    String   @map("inviter_user_id")
+  email            String
+  token            String   @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  relationshipType String   @default("anhörig") @map("relationship_type")
+  status           String   @default("pending")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+  expiresAt        DateTime @map("expires_at") @db.Timestamptz
+
+  inviter User @relation(fields: [inviterUserId], references: [id], onDelete: Cascade)
+
+  @@unique([inviterUserId, email])
+  @@index([email])
+  @@index([token])
+  @@map("care_invites")
 }
 
 model HomeScreenSettings {

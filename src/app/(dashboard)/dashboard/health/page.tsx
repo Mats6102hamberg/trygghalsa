@@ -188,7 +188,7 @@ export default async function HealthPage() {
         {latestMetrics.length > 0 && (
           <section className="rounded-2xl border bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-gray-900">Hälsodata</h2>
-            <div className="mt-3 grid grid-cols-2 gap-3">
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
               {latestMetrics.map((m) => (
                 <div
                   key={m.id}
