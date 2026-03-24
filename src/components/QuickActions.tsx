@@ -13,12 +13,12 @@ interface HomeButton {
 
 const buttonRoutes: Record<string, string> = {
   medications: '/dashboard/medications',
-  health: '/dashboard',
+  health: '/dashboard/health',
   appointments: '/dashboard/appointments',
-  help: '/dashboard/questions',
+  help: '/dashboard/help',
   questions: '/dashboard/questions',
-  timeline: '/dashboard',
-  contact_family: '/dashboard/settings',
+  timeline: '/dashboard/timeline',
+  contact_family: '/dashboard/contact-family',
 };
 
 const buttonEmojis: Record<string, string> = {
