@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Hälsakoll
+
+Din hälsa, tryggt samlad på ett ställe.
+
+Hälsakoll hjälper dig hålla koll på mediciner, läkarbesök, diagnoser och frågor till vården. Enkel att använda — även för dig som inte är van vid appar.
+
+## Stack
+
+- **Framework:** Next.js 16 (Turbopack)
+- **Database:** Neon PostgreSQL + Prisma 7
+- **Auth:** Clerk
+- **Payments:** Stripe (checkout + webhooks)
+- **AI:** Claude API (health summaries, question generation)
+- **Styling:** Tailwind CSS
+- **Hosting:** Vercel
+
+## Features
+
+- Medicinlista med tider och markering av intag
+- Kommande vårdbesök
+- Frågor till vården (manuella + AI-genererade)
+- Tidslinje med medicinsk historik
+- Hälsoöversikt med diagnoser och AI-sammanfattning
+- Anhörigåtkomst (Premium)
+- Nödnummer (112, 1177)
+- "Viktigt idag"-dashboard
+- Exportfunktion
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
+npx prisma generate
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Öppna [http://localhost:4567](http://localhost:4567).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Skapa `.env` med:
 
-## Learn More
+```
+DATABASE_URL=
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+STRIPE_SECRET_KEY=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+STRIPE_PRICE_ID=
+STRIPE_WEBHOOK_SECRET=
+NEXT_PUBLIC_APP_URL=
+ANTHROPIC_API_KEY=
+RESEND_API_KEY=
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Deploy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Deployas automatiskt via Vercel vid push till `main`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Live: [trygghalsa.vercel.app](https://trygghalsa.vercel.app) (snart halsakoll.se)
