@@ -2,7 +2,7 @@ import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 
 export const metadata = {
-  title: 'TryggHälsa',
+  title: 'Hälsakoll',
   description: 'Din trygga hälsojournal',
 };
 

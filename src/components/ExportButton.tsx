@@ -9,12 +9,12 @@ export function ExportButton({ events }: { events: Event[] }) {
         `${e.date} | ${e.type}: ${e.title}${e.provider_name ? ` (${e.provider_name})` : ''}${e.description ? ` – ${e.description}` : ''}`
     );
 
-    const content = `TryggHälsa – Exporterad tidslinje\n${'='.repeat(40)}\n\n${lines.join('\n')}`;
+    const content = `Hälsakoll – Exporterad tidslinje\n${'='.repeat(40)}\n\n${lines.join('\n')}`;
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `trygghalsa-export-${new Date().toISOString().slice(0, 10)}.txt`;
+    a.download = `halsakoll-export-${new Date().toISOString().slice(0, 10)}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   }

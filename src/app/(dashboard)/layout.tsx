@@ -22,7 +22,7 @@ export default async function DashboardLayout({
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-8">
               <Link href="/dashboard" className="text-xl font-semibold text-gray-900">
-                TryggHälsa
+                Hälsakoll
               </Link>
               <div className="hidden sm:flex gap-6">
                 <Link href="/dashboard/timeline" className="text-sm text-gray-600 hover:text-gray-900">

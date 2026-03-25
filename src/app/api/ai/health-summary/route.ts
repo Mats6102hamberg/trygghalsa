@@ -79,7 +79,7 @@ export async function POST() {
     });
   }
 
-  const prompt = `Du är en hjälpsam hälsoassistent i appen TryggHälsa. Skriv en kort, lugn och tydlig sammanfattning på svenska (3-5 meningar) som hjälper användaren förstå sin hälsosituation.
+  const prompt = `Du är en hjälpsam hälsoassistent i appen Hälsakoll. Skriv en kort, lugn och tydlig sammanfattning på svenska (3-5 meningar) som hjälper användaren förstå sin hälsosituation.
 
 Du får INTE ställa diagnos eller ge behandlingsråd. Var neutral och trygg i tonen.
 

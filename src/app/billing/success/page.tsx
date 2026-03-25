@@ -7,7 +7,7 @@ export default function BillingSuccessPage() {
         <div className="text-5xl mb-4">🎉</div>
         <h1 className="text-2xl font-bold text-gray-900">Premium aktiverat!</h1>
         <p className="mt-3 text-gray-600">
-          Tack för att du uppgraderar till TryggHälsa Premium. Du har nu tillgång till anhörigöversikt, statusvarningar och mer.
+          Tack för att du uppgraderar till Hälsakoll Premium. Du har nu tillgång till anhörigöversikt, statusvarningar och mer.
         </p>
         <Link
           href="/dashboard/care"

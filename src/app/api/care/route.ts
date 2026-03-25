@@ -132,7 +132,7 @@ export async function POST(request: Request) {
   try {
     await sendCareInviteEmail({
       to: parsed.data.caregiverEmail,
-      inviterEmail: inviterUser.email ?? 'en TryggHälsa-användare',
+      inviterEmail: inviterUser.email ?? 'en Hälsakoll-användare',
       signUpUrl,
     });
   } catch {

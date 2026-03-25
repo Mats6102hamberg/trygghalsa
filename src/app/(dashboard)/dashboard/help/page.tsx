@@ -110,11 +110,11 @@ export default async function HelpPage() {
           </div>
         </section>
 
-        {/* Om TryggHälsa */}
+        {/* Om Hälsakoll */}
         <section className="rounded-2xl border bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900">Om TryggHälsa</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Om Hälsakoll</h2>
           <p className="mt-2 text-sm text-gray-600">
-            TryggHälsa hjälper dig hålla koll på din hälsa, dina mediciner och kommande
+            Hälsakoll hjälper dig hålla koll på din hälsa, dina mediciner och kommande
             vårdbesök. Appen är byggd för att vara enkel och trygg — speciellt för dig
             som vill ha hjälp att förbereda dig inför läkarbesök eller vill att en
             anhörig kan se att allt är OK.
