@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation';
 import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import { MobileTabBar } from '@/components/MobileTabBar';
+import { OfflineBanner } from '@/components/OfflineBanner';
+import { InstallPrompt } from '@/components/InstallPrompt';
 
 export default async function DashboardLayout({
   children,
@@ -17,6 +19,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <OfflineBanner />
       <nav className="bg-white border-b border-gray-200">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
@@ -49,6 +52,7 @@ export default async function DashboardLayout({
           </div>
         </div>
       </nav>
+      <InstallPrompt />
       <main className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 pb-24 sm:pb-8">
         {children}
       </main>

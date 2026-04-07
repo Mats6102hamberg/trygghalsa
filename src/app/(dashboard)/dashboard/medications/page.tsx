@@ -38,6 +38,17 @@ export default function MedicationsPage() {
     medicationId: string,
     scheduledTime: string | null
   ) => {
+    const timeKey = scheduledTime ?? '__no_time__';
+
+    // Optimistic update
+    setMedications((prev) =>
+      prev.map((m) =>
+        m.id === medicationId
+          ? { ...m, takenTodayTimes: [...m.takenTodayTimes, timeKey] }
+          : m
+      )
+    );
+
     try {
       setSavingId(`${medicationId}-${scheduledTime ?? 'no-time'}`);
       setError(null);
@@ -48,12 +59,30 @@ export default function MedicationsPage() {
         body: JSON.stringify({ medication_id: medicationId, scheduled_time: scheduledTime }),
       });
 
+      // 202 = queued by service worker for later sync
+      if (res.status === 202) {
+        return;
+      }
+
       if (!res.ok) {
         throw new Error('Kunde inte spara medicinintag.');
       }
 
       await loadMedications();
     } catch (err) {
+      // Revert optimistic update
+      setMedications((prev) =>
+        prev.map((m) =>
+          m.id === medicationId
+            ? {
+                ...m,
+                takenTodayTimes: m.takenTodayTimes.filter(
+                  (t, i, arr) => !(t === timeKey && i === arr.lastIndexOf(timeKey))
+                ),
+              }
+            : m
+        )
+      );
       setError(err instanceof Error ? err.message : 'Något gick fel.');
     } finally {
       setSavingId(null);
