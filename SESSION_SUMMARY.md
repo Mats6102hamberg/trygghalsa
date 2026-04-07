@@ -1,6 +1,23 @@
-# Session Summary — 2026-03-25
+# Session Summary — 2026-04-07
 
-## What was done
+## What was done (2026-04-07)
+
+### PWA — Offline-stöd och installationsprompt
+- `src/sw.ts` — Serwist service worker med background sync för `/api/medications/log` (kö offline i 24h), StaleWhileRevalidate för kritiska endpoints, NetworkOnly för Clerk
+- `src/components/OfflineBanner.tsx` — Amber-banner när användaren är offline
+- `src/components/InstallPrompt.tsx` — iOS + Android install-prompt med localStorage-dismissed
+- `src/hooks/useOnlineStatus.ts` — `useSyncExternalStore`-baserad online/offline-hook
+- `public/manifest.json` — Web App Manifest (start_url: /dashboard, standalone)
+- `public/icons/` — 192/384/512/maskable PNG-ikoner
+- `src/app/layout.tsx` — PWA metadata (manifest, appleWebApp, viewport themeColor)
+- `src/app/(dashboard)/layout.tsx` — OfflineBanner + InstallPrompt monterade
+- `src/app/(dashboard)/dashboard/medications/page.tsx` — Optimistisk UI-uppdatering + 202-hantering för queued requests
+- `next.config.ts` — Serwist-wrapper med `disable: dev`
+- `package.json` — `--webpack` flag i build (Serwist v9 ej Turbopack-kompatibelt ännu)
+- `src/proxy.ts` — Rename från `middleware.ts` (Next.js 16 deprecation fix)
+- **Commit:** `8a01bcd`
+
+## What was done (tidigare)
 
 ### Stripe Webhooks
 - Created webhook endpoint in Stripe Dashboard for `https://trygghalsa.vercel.app/api/stripe/webhook`

@@ -35,9 +35,13 @@ Update in Vercel env vars:
 - Need to create Google OAuth 2.0 Client ID in Google Cloud Console
 - Add redirect URI from Clerk, paste Client ID + Secret in Clerk → SSO connections
 
-### 7. Rename middleware.ts to proxy.ts
-- Build warning: `The "middleware" filename convention is deprecated. Use "proxy" instead.`
-- Simple rename: `src/middleware.ts` → `src/proxy.ts`
+### 7. ~~Rename middleware.ts to proxy.ts~~ ✅ KLAR
+- Genomfört: `src/middleware.ts` → `src/proxy.ts` i commit `8a01bcd`
+
+## PWA — Kvarvarande (valfritt)
+- `public/sw.js` är genererad vid build — lägg till i `.gitignore` om du vill undvika att committa den i framtiden
+- Serwist v9 stöder inte Turbopack ännu; följ https://github.com/serwist/serwist/issues/54 — när det löses kan `--webpack` tas bort från build-scriptet
+- Testa background sync på riktig mobil (Chrome DevTools → Application → Background Sync)
 
 ## Current Clerk setup
 - **Old app (dev, currently active):** wealthy-krill-15 (keys in Vercel env vars)
